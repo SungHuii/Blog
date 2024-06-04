@@ -61,7 +61,7 @@ jobs:
         id: current-time
         with:
           format: YYYY-MM-DDTHH-mm-ss
-          utc0ffset: "+09:00"
+          utcOffset: "+09:00"
 
       # 배포용 패키지 경로 저장
       - name: Set artifact
@@ -73,8 +73,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: springboot-developer
-          environment_name: springboot-developer-env
+          application_name: spring-boot-developer
+          environment_name: SpringBootDeveloper-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: ./build/libs/${{env.artifact}}
