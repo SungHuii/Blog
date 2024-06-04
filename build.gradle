@@ -45,4 +45,8 @@ test {
     useJUnitPlatform()
 }
 
+jar {
+    enabled = false
+}
+
 // 338pg
