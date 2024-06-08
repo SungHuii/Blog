@@ -73,10 +73,14 @@ package me.sunghui.springbootdeveloper.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import me.sunghui.springbootdeveloper.config.error.exception.ArticleNotFoundException;
 import me.sunghui.springbootdeveloper.domain.Article;
+import me.sunghui.springbootdeveloper.domain.Comment;
 import me.sunghui.springbootdeveloper.dto.AddArticleRequest;
+import me.sunghui.springbootdeveloper.dto.AddCommentRequest;
 import me.sunghui.springbootdeveloper.dto.UpdateArticleRequest;
 import me.sunghui.springbootdeveloper.repository.BlogRepository;
+import me.sunghui.springbootdeveloper.repository.CommentRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +91,8 @@ import java.util.List;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    // 댓글 추가코드 추가 작성
+    private final CommentRepository commentRepository;
 
     public Article save(AddArticleRequest request, String userName) {
         return blogRepository.save(request.toEntity(userName));
@@ -98,7 +104,8 @@ public class BlogService {
 
     public Article findById(long id) {
         return blogRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+                .orElseThrow(ArticleNotFoundException::new);
+        // id에 해당하는 레코드가 없으면 ArticleNotFoundException 예외를 던지도록 수정
     }
 
     public void delete(long id) {
@@ -125,6 +132,15 @@ public class BlogService {
         if (!article.getAuthor().equals(userName)) {
             throw new IllegalArgumentException("not authorized");
         }
+    }
+
+    // 댓글 추가하는 메서드. 요청받은 블로그 글 아이디로 블로그 글을 찾음
+    // 이 후 댓글 내용, 작성자, 블로그 글을 넘겨주어 commentRepository의 save() 메서드를 호출해 댓글 생성
+    public Comment addComment(AddCommentRequest request, String userName) {
+        Article article = blogRepository.findById(request.getArticleId())
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + request.getArticleId()));
+
+        return commentRepository.save(request.toEntity(userName, article));
     }
 
 }

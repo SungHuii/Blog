@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EntityListeners(AuditingEntityListener.class) // 엔티티의 생성 및 수정 시간을 자동으로 감시하고 기록
 @Entity // 엔티티로 지정
@@ -36,6 +37,14 @@ public class Article {
     @LastModifiedDate // 엔티티가 수정될 때 수정 시간 저장
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
+    // 하나의 글(One Article)이 여러 댓글(To Many Comments)를 가지게 됨
+    // mappedBy는 자식 엔티티(Comment)가 부모 엔티티(Article)를 참조할 때 사용
+    // cascade 속성은 부모 엔티티(Article)를 변경할 때 자식 엔티티(Comment)에 전파하기 위한 방법 중 삭제에 관련된 설정값.
+    // 블로그 글 엔티티가 삭제되면 댓글 엔티티를 모두 삭제함
+    private List<Comment> comments;
+
 
     // lombok 에서 지원하는 애너테이션
     // 생성자 위에 애너테이션 입력시 빌더 패턴 방식으로 객체 생성 가능
